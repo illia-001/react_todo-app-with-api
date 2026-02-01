@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { useEffect, useRef } from 'react';
 
-type Props = {
+type HeaderProps = {
   onSubmit: (value: React.FormEvent) => void;
   onSetTitle: (query: string) => void;
   onToggleAll: () => void;
@@ -12,7 +12,7 @@ type Props = {
   focus: number;
 };
 
-export const NewTodo: React.FC<Props> = ({
+export const Header: React.FC<HeaderProps> = ({
   onSubmit,
   activeTodos,
   todosQuantity,

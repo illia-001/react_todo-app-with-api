@@ -3,15 +3,14 @@ import cn from 'classnames';
 import React from 'react';
 import { Todo } from '../types/Todo';
 
-type Props = {
+type TodoItemProps = {
   todo: Todo;
   isProcessed?: boolean | undefined;
-  loading?: boolean;
   onDelete?: (todoId: number) => void;
   onUpdate?: (todo: Todo) => void;
 };
 
-export const TodoItem: React.FC<Props> = ({
+export const TodoItem: React.FC<TodoItemProps> = ({
   todo,
   onDelete = () => {},
   onUpdate = () => {},
@@ -26,7 +25,7 @@ export const TodoItem: React.FC<Props> = ({
           data-cy="TodoStatus"
           type="checkbox"
           className="todo__status"
-          onClick={() => onUpdate(todo)}
+          onChange={() => onUpdate(todo)}
           checked={completed}
         />
       </label>

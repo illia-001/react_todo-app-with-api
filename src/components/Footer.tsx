@@ -3,7 +3,7 @@ import cn from 'classnames';
 import React from 'react';
 import { Filters } from '../types/Filters';
 
-type Props = {
+type FooterProps = {
   filterField: Filters;
   onChangeFilter: (filterBy: Filters) => void;
   onClear: () => void;
@@ -11,7 +11,7 @@ type Props = {
   activeItemsCount: number;
 };
 
-export const Filter: React.FC<Props> = ({
+export const Footer: React.FC<FooterProps> = ({
   filterField,
   onChangeFilter,
   completedItemsCount,

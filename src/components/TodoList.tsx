@@ -8,7 +8,7 @@ type Props = {
   onDelete: (todoId: number) => void;
   toggleTodoStatus: (todo: Todo) => void;
   creating: Todo | null;
-  processingIds: number[];
+  isLoading: number[];
 };
 
 export const TodoList: React.FC<Props> = ({
@@ -16,7 +16,7 @@ export const TodoList: React.FC<Props> = ({
   onDelete,
   toggleTodoStatus,
   creating,
-  processingIds,
+  isLoading,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -31,11 +31,9 @@ export const TodoList: React.FC<Props> = ({
           >
             <TodoItem
               todo={todo}
-              isProcessed={processingIds.includes(todo.id)}
-              onDelete={() => onDelete(todo.id)}
-              onUpdate={todoForEditing => {
-                toggleTodoStatus(todoForEditing);
-              }}
+              isProcessed={isLoading.includes(todo.id)}
+              onDelete={onDelete}
+              onUpdate={toggleTodoStatus}
             />
           </CSSTransition>
         ))}

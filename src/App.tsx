@@ -1,19 +1,22 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
+//#region import
 import classNames from 'classnames';
 
 import React, { useEffect, useState } from 'react';
 
 import * as todoServise from './api/todos';
 import { TodoList } from './components/TodoList';
-import { Filter } from './components/Filter';
+import { Footer } from './components/Footer';
 
 import { Todo } from './types/Todo';
 import { Filters } from './types/Filters';
 
-import { NewTodo } from './components/NewTodo';
+import { Header } from './components/Header';
 import { Errors } from './types/Errors';
 import { normalizeTitle } from './utils/normilizeTitle';
+import { filteringTodos } from './utils/filteringTodos';
+//#endregion
 
 export const App: React.FC = () => {
   //#region state
@@ -25,18 +28,17 @@ export const App: React.FC = () => {
   const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
   const [isInputDisable, setIsInputDisable] = useState<boolean>(false);
   const [focus, setFocus] = useState<number>(0);
-  const [processingIds, setProcessingIds] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState<number[]>([]);
 
   const [title, setTitle] = useState('');
 
   const activeTodosCount: number = todos.filter(todo => !todo.completed).length;
   const todosCount = todos.length;
-
   //#endregion
 
   useEffect(() => {
     const calculateCompletedTodos = todos
-      .filter(todo => todo.completed === true)
+      .filter(todo => todo.completed)
       .map(todo => todo.id);
 
     setCompletedTodoIds(calculateCompletedTodos);
@@ -73,7 +75,7 @@ export const App: React.FC = () => {
   };
 
   const handleDeleteTodo = (todoId: number) => {
-    setProcessingIds(prev => [...prev, todoId]);
+    setIsLoading(prev => [...prev, todoId]);
     todoServise
       .deleteTodo(todoId)
       .then(() => {
@@ -84,7 +86,7 @@ export const App: React.FC = () => {
       })
       .catch(() => handleShowError(Errors.DeleteTodo))
       .finally(() => {
-        setProcessingIds(prev => prev.filter(prevId => prevId !== todoId));
+        setIsLoading(prev => prev.filter(prevId => prevId !== todoId));
       });
   };
 
@@ -117,7 +119,7 @@ export const App: React.FC = () => {
     };
 
     setTempTodo(newTempTodo);
-    setProcessingIds(prev => [...prev, newTempTodo.id]);
+    setIsLoading(prev => [...prev, newTempTodo.id]);
 
     todoServise
       .createTodo(newTempTodo)
@@ -129,16 +131,14 @@ export const App: React.FC = () => {
       .finally(() => {
         setTempTodo(null);
         setIsInputDisable(false);
-        setProcessingIds(prev =>
-          prev.filter(prevId => prevId !== newTempTodo.id),
-        );
+        setIsLoading(prev => prev.filter(prevId => prevId !== newTempTodo.id));
       });
   };
 
   const handleChangeTodoStatus = (todo: Todo) => {
     const { id, completed } = todo;
 
-    setProcessingIds(prev => [...prev, id]);
+    setIsLoading(prev => [...prev, id]);
 
     if (!completedTodoIds.includes(id)) {
       setCompletedTodoIds(prev => [...prev, id]);
@@ -161,7 +161,7 @@ export const App: React.FC = () => {
       })
       .catch(() => handleShowError(Errors.UpdateTodo))
       .finally(() => {
-        setProcessingIds(prev => prev.filter(prevId => prevId !== id));
+        setIsLoading(prev => prev.filter(prevId => prevId !== id));
       });
   };
 
@@ -172,7 +172,7 @@ export const App: React.FC = () => {
       todos.forEach(todo => handleChangeTodoStatus(todo));
     } else {
       activeTodos.forEach(currentTodo => {
-        setProcessingIds(prev => [...prev, currentTodo.id]);
+        setIsLoading(prev => [...prev, currentTodo.id]);
         todoServise
           .editTodo(currentTodo.id, { completed: true })
           .then(editedTodo => {
@@ -182,7 +182,7 @@ export const App: React.FC = () => {
           })
           .catch(() => handleShowError(Errors.UpdateTodo))
           .finally(() => {
-            setProcessingIds(prev =>
+            setIsLoading(prev =>
               prev.filter(prevId => prevId !== currentTodo.id),
             );
           });
@@ -192,31 +192,17 @@ export const App: React.FC = () => {
 
   //#endregion
 
-  const filteredTodos = [...todos].filter(todo => {
-    switch (filterByField) {
-      case Filters.Default:
-        return todo;
-
-      case Filters.Active:
-        return todo.completed === false;
-
-      case Filters.Completed:
-        return todo.completed === true;
-
-      default:
-        return;
-    }
-  });
+  const filteredTodos = filteringTodos(todos, filterByField);
 
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <NewTodo
-          onSubmit={event => handleSubmitNewTodo(event)}
+        <Header
+          onSubmit={handleSubmitNewTodo}
           query={title}
-          onSetTitle={query => setTitle(query)}
+          onSetTitle={setTitle}
           activeTodos={activeTodosCount}
           todosQuantity={todosCount}
           isDisabled={isInputDisable}
@@ -226,7 +212,7 @@ export const App: React.FC = () => {
 
         {todos.length > 0 && (
           <TodoList
-            processingIds={processingIds}
+            isLoading={isLoading}
             visibleTodos={filteredTodos}
             creating={tempTodo}
             onDelete={handleDeleteTodo}
@@ -236,7 +222,7 @@ export const App: React.FC = () => {
 
         {/* Hide the footer if there are no todos */}
         {(todos.length > 0 || tempTodo) && (
-          <Filter
+          <Footer
             onChangeFilter={handleChangeFilterField}
             onClear={handleClearComplatedTodos}
             filterField={filterByField}
