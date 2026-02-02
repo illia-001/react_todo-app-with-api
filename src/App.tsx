@@ -28,7 +28,10 @@ export const App: React.FC = () => {
   const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
   const [isInputDisable, setIsInputDisable] = useState<boolean>(false);
   const [focus, setFocus] = useState<number>(0);
+  const [focusEdit, setFocusEdit] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<number[]>([]);
+  const [isDoubleClick, setIsDoubleClick] = useState(false);
+  const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
 
   const [title, setTitle] = useState('');
 
@@ -83,8 +86,13 @@ export const App: React.FC = () => {
           currentTodos.filter(todo => todo.id !== todoId),
         );
         setFocus(current => current + 1);
+        setIsDoubleClick(false);
+        setSelectedTodoId(null);
       })
-      .catch(() => handleShowError(Errors.DeleteTodo))
+      .catch(() => {
+        handleShowError(Errors.DeleteTodo);
+        setFocusEdit(prev => prev + 1);
+      })
       .finally(() => {
         setIsLoading(prev => prev.filter(prevId => prevId !== todoId));
       });
@@ -190,6 +198,50 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleDoubleClick = (todoId: number) => {
+    setIsDoubleClick(prev => !prev);
+    setSelectedTodoId(todoId);
+  };
+
+  const handleEditTitle = (newTitle: string, todo: Todo) => {
+    const { id, title: oldTitle } = todo;
+
+    const normilizedNewTitle = normalizeTitle(newTitle);
+
+    if (normilizedNewTitle === oldTitle) {
+      setIsDoubleClick(false);
+      setSelectedTodoId(null);
+
+      return;
+    }
+
+    if (!normilizedNewTitle) {
+      handleDeleteTodo(id);
+
+      return;
+    }
+
+    setIsLoading(prev => [...prev, id]);
+
+    todoServise
+      .editTodo(id, { title: normilizedNewTitle })
+      .then(editedTodo => {
+        setTodos(prev =>
+          prev.map(prevTodo =>
+            prevTodo.id === editedTodo.id ? editedTodo : prevTodo,
+          ),
+        );
+        setIsDoubleClick(false);
+        setSelectedTodoId(null);
+      })
+      .catch(() => {
+        handleShowError(Errors.UpdateTodo);
+        setFocusEdit(prev => prev + 1);
+      })
+      .finally(() => {
+        setIsLoading(prev => prev.filter(prevId => prevId !== id));
+      });
+  };
   //#endregion
 
   const filteredTodos = filteringTodos(todos, filterByField);
@@ -217,6 +269,11 @@ export const App: React.FC = () => {
             creating={tempTodo}
             onDelete={handleDeleteTodo}
             toggleTodoStatus={handleChangeTodoStatus}
+            onEditTitle={handleEditTitle}
+            isDoubleClick={isDoubleClick}
+            onDoubleClick={handleDoubleClick}
+            selectedTodoId={selectedTodoId}
+            focusEdit={focusEdit}
           />
         )}
 
