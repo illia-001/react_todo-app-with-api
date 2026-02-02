@@ -2,17 +2,19 @@
 import cn from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { Todo } from '../types/Todo';
+import { KeyUp } from '../types/KeyUp';
+import { normalizeTitle } from '../utils/normilizeTitle';
 
 type TodoItemProps = {
   todo: Todo;
   isProcessed?: boolean | undefined;
   isDoubleClick?: boolean;
+  selectedTodoId?: number | null;
+  focusEdit?: number;
   onDelete?: (todoId: number) => void;
   onUpdate?: (todo: Todo) => void;
   onDoubleClick?: (id: number) => void;
   onEdit?: (query: string, todo: Todo) => void;
-  selectedTodoId?: number | null;
-  focusEdit?: number;
 };
 
 export const TodoItem: React.FC<TodoItemProps> = ({
@@ -20,20 +22,20 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   onDelete = () => {},
   onUpdate = () => {},
   onEdit = () => {},
+  onDoubleClick = () => {},
   isProcessed = false,
   isDoubleClick,
-  onDoubleClick = () => {},
   selectedTodoId,
   focusEdit,
 }) => {
   const { id, title, completed } = todo;
   const [newTitle, setNewTitle] = useState(title);
-  const isClicked = selectedTodoId === id && isDoubleClick;
-  const focusInputEdit = useRef<HTMLInputElement>(null);
+  const isEditFormVisible = selectedTodoId === id && isDoubleClick;
+  const focusEditInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === KeyUp.Esc) {
         setNewTitle(title);
         onDoubleClick(id);
       }
@@ -41,7 +43,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
       return;
     };
 
-    if (isClicked) {
+    if (isEditFormVisible) {
       document.addEventListener('keyup', handleKeyUp);
     }
 
@@ -51,14 +53,15 @@ export const TodoItem: React.FC<TodoItemProps> = ({
   }, [selectedTodoId]);
 
   useEffect(() => {
-    if (focusInputEdit.current && isDoubleClick) {
-      focusInputEdit.current.focus();
+    if (focusEditInput.current && isDoubleClick) {
+      focusEditInput.current.focus();
     }
   }, [focusEdit]);
 
   const handleSubmitNewTitle = (event: React.FormEvent) => {
     event.preventDefault();
 
+    setNewTitle(prev => normalizeTitle(prev));
     onEdit(newTitle, todo);
   };
 
@@ -74,7 +77,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
         />
       </label>
 
-      {(isClicked && (
+      {(isEditFormVisible && (
         <form onSubmit={handleSubmitNewTitle}>
           <input
             data-cy="TodoTitleField"
@@ -86,7 +89,7 @@ export const TodoItem: React.FC<TodoItemProps> = ({
             }}
             onBlur={handleSubmitNewTitle}
             value={newTitle}
-            ref={focusInputEdit}
+            ref={focusEditInput}
             autoFocus
           />
         </form>

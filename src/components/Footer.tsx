@@ -5,17 +5,17 @@ import { Filters } from '../types/Filters';
 
 type FooterProps = {
   filterField: Filters;
-  onChangeFilter: (filterBy: Filters) => void;
-  onClear: () => void;
   completedItemsCount: number;
   activeItemsCount: number;
+  onChangeFilter: (filterBy: Filters) => void;
+  onClear: () => void;
 };
 
 export const Footer: React.FC<FooterProps> = ({
   filterField,
-  onChangeFilter,
   completedItemsCount,
   activeItemsCount,
+  onChangeFilter,
   onClear,
 }) => {
   return (

@@ -26,12 +26,12 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
   const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
+  const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
   const [isInputDisable, setIsInputDisable] = useState<boolean>(false);
   const [focus, setFocus] = useState<number>(0);
   const [focusEdit, setFocusEdit] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<number[]>([]);
   const [isDoubleClick, setIsDoubleClick] = useState(false);
-  const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
 
   const [title, setTitle] = useState('');
 
@@ -79,6 +79,7 @@ export const App: React.FC = () => {
 
   const handleDeleteTodo = (todoId: number) => {
     setIsLoading(prev => [...prev, todoId]);
+
     todoServise
       .deleteTodo(todoId)
       .then(() => {

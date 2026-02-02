@@ -5,28 +5,28 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 type Props = {
   visibleTodos: Todo[];
-  onDelete: (todoId: number) => void;
-  onDoubleClick: (id: number) => void;
-  toggleTodoStatus: (todo: Todo) => void;
   creating: Todo | null;
   isLoading: number[];
   isDoubleClick: boolean;
-  onEditTitle: (query: string, todo: Todo) => void;
   selectedTodoId: number | null;
   focusEdit: number;
+  onDelete: (todoId: number) => void;
+  onDoubleClick: (id: number) => void;
+  toggleTodoStatus: (todo: Todo) => void;
+  onEditTitle: (query: string, todo: Todo) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
   visibleTodos,
-  onDelete,
-  toggleTodoStatus,
   creating,
   isLoading,
-  onEditTitle,
   isDoubleClick,
-  onDoubleClick,
   selectedTodoId,
   focusEdit,
+  onDelete,
+  onDoubleClick,
+  toggleTodoStatus,
+  onEditTitle,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">

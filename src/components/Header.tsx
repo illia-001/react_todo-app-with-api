@@ -2,24 +2,24 @@ import cn from 'classnames';
 import React, { useEffect, useRef } from 'react';
 
 type HeaderProps = {
-  onSubmit: (value: React.FormEvent) => void;
-  onSetTitle: (query: string) => void;
-  onToggleAll: () => void;
   activeTodos: number;
   todosQuantity: number;
   isDisabled: boolean;
   query: string;
   focus: number;
+  onSubmit: (value: React.FormEvent) => void;
+  onSetTitle: (query: string) => void;
+  onToggleAll: () => void;
 };
 
 export const Header: React.FC<HeaderProps> = ({
-  onSubmit,
   activeTodos,
   todosQuantity,
-  onSetTitle,
   isDisabled,
   query,
   focus,
+  onSubmit,
+  onSetTitle,
   onToggleAll,
 }) => {
   const inputFocus = useRef<HTMLInputElement>(null);
