@@ -32,7 +32,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="todoapp__header">
-      {/* this button should have `active` class only if all todos are completed */}
       {todosQuantity > 0 && (
         <button
           type="button"
@@ -42,7 +41,6 @@ export const Header: React.FC<HeaderProps> = ({
         />
       )}
 
-      {/* Add a todo on form submit */}
       <form onSubmit={onSubmit}>
         <input
           data-cy="NewTodoField"

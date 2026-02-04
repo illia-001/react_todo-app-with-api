@@ -30,7 +30,6 @@ export const TodoList: React.FC<Props> = ({
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
-      {/* This is a completed todo */}
       <TransitionGroup>
         {visibleTodos.map(todo => (
           <CSSTransition

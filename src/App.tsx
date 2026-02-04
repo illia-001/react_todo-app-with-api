@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 //#region import
-import classNames from 'classnames';
-
 import React, { useEffect, useState } from 'react';
 
 import * as todoServise from './api/todos';
@@ -15,7 +13,8 @@ import { Filters } from './types/Filters';
 import { Header } from './components/Header';
 import { Errors } from './types/Errors';
 import { normalizeTitle } from './utils/normilizeTitle';
-import { filteringTodos } from './utils/filteringTodos';
+import { getFilteredTodos } from './utils/getFilteredTodos';
+import { ErrorNotification } from './components/ErrorNotification';
 //#endregion
 
 export const App: React.FC = () => {
@@ -27,9 +26,9 @@ export const App: React.FC = () => {
 
   const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
-  const [isInputDisable, setIsInputDisable] = useState<boolean>(false);
-  const [focus, setFocus] = useState<number>(0);
-  const [focusEdit, setFocusEdit] = useState<number>(0);
+  const [isInputDisable, setIsInputDisable] = useState(false);
+  const [focus, setFocus] = useState(0);
+  const [focusEdit, setFocusEdit] = useState(0);
   const [isLoading, setIsLoading] = useState<number[]>([]);
   const [isDoubleClick, setIsDoubleClick] = useState(false);
 
@@ -179,24 +178,26 @@ export const App: React.FC = () => {
 
     if (activeTodos.length === 0) {
       todos.forEach(todo => handleChangeTodoStatus(todo));
-    } else {
-      activeTodos.forEach(currentTodo => {
-        setIsLoading(prev => [...prev, currentTodo.id]);
-        todoServise
-          .editTodo(currentTodo.id, { completed: true })
-          .then(editedTodo => {
-            setTodos(prev =>
-              prev.map(todo => (todo.id === editedTodo.id ? editedTodo : todo)),
-            );
-          })
-          .catch(() => handleShowError(Errors.UpdateTodo))
-          .finally(() => {
-            setIsLoading(prev =>
-              prev.filter(prevId => prevId !== currentTodo.id),
-            );
-          });
-      });
+
+      return;
     }
+
+    activeTodos.forEach(currentTodo => {
+      setIsLoading(prev => [...prev, currentTodo.id]);
+      todoServise
+        .editTodo(currentTodo.id, { completed: true })
+        .then(editedTodo => {
+          setTodos(prev =>
+            prev.map(todo => (todo.id === editedTodo.id ? editedTodo : todo)),
+          );
+        })
+        .catch(() => handleShowError(Errors.UpdateTodo))
+        .finally(() => {
+          setIsLoading(prev =>
+            prev.filter(prevId => prevId !== currentTodo.id),
+          );
+        });
+    });
   };
 
   const handleDoubleClick = (todoId: number) => {
@@ -245,7 +246,7 @@ export const App: React.FC = () => {
   };
   //#endregion
 
-  const filteredTodos = filteringTodos(todos, filterByField);
+  const filteredTodos = getFilteredTodos(todos, filterByField);
 
   return (
     <div className="todoapp">
@@ -278,7 +279,6 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* Hide the footer if there are no todos */}
         {(todos.length > 0 || tempTodo) && (
           <Footer
             onChangeFilter={handleChangeFilterField}
@@ -290,27 +290,10 @@ export const App: React.FC = () => {
         )}
       </div>
 
-      <div
-        data-cy="ErrorNotification"
-        className={classNames(
-          'notification',
-          'is-danger',
-          'is-light',
-          'has-text-weight-normal',
-          { hidden: errorMessage === Errors.Default },
-        )}
-      >
-        <button
-          data-cy="HideErrorButton"
-          type="button"
-          className="delete"
-          onClick={() => {
-            setErrorMessage(Errors.Default);
-          }}
-        />
-        {errorMessage}
-        <br />
-      </div>
+      <ErrorNotification
+        errorMessage={errorMessage}
+        onSetError={setErrorMessage}
+      />
     </div>
   );
 };

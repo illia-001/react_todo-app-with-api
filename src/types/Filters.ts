@@ -3,3 +3,5 @@ export enum Filters {
   Active = 'active',
   Completed = 'completed',
 }
+
+export const filtersList = Object.values(Filters);

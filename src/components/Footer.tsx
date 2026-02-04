@@ -1,7 +1,7 @@
 import cn from 'classnames';
 
 import React from 'react';
-import { Filters } from '../types/Filters';
+import { Filters, filtersList } from '../types/Filters';
 
 type FooterProps = {
   filterField: Filters;
@@ -24,43 +24,22 @@ export const Footer: React.FC<FooterProps> = ({
         {`${activeItemsCount} items left`}
       </span>
 
-      {/* Active link should have the 'selected' class */}
       <nav className="filter" data-cy="Filter">
-        <a
-          href="#/"
-          className={cn('filter__link', {
-            selected: filterField === Filters.Default,
-          })}
-          data-cy="FilterLinkAll"
-          onClick={() => onChangeFilter(Filters.Default)}
-        >
-          All
-        </a>
-
-        <a
-          href="#/active"
-          className={cn('filter__link', {
-            selected: filterField === Filters.Active,
-          })}
-          data-cy="FilterLinkActive"
-          onClick={() => onChangeFilter(Filters.Active)}
-        >
-          Active
-        </a>
-
-        <a
-          href="#/completed"
-          className={cn('filter__link', {
-            selected: filterField === Filters.Completed,
-          })}
-          data-cy="FilterLinkCompleted"
-          onClick={() => onChangeFilter(Filters.Completed)}
-        >
-          Completed
-        </a>
+        {filtersList.map(filter => (
+          <a
+            key={filter}
+            href={`#/${filter}`}
+            className={cn('filter__link', {
+              selected: filter === filterField,
+            })}
+            data-cy="FilterLinkAll"
+            onClick={() => onChangeFilter(filter)}
+          >
+            {filter}
+          </a>
+        ))}
       </nav>
 
-      {/* this button should be disabled if there are no completed todos */}
       <button
         type="button"
         className="todoapp__clear-completed"

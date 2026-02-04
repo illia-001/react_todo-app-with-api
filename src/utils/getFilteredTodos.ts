@@ -1,7 +1,7 @@
 import { Filters } from '../types/Filters';
 import { Todo } from '../types/Todo';
 
-export function filteringTodos(todos: Todo[], filterField: Filters) {
+export function getFilteredTodos(todos: Todo[], filterField: Filters) {
   return todos.filter(todo => {
     switch (filterField) {
       case Filters.Default:
