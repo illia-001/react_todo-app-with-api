@@ -1,7 +1,7 @@
 import cn from 'classnames';
 
 import React from 'react';
-import { Filters, filtersList } from '../types/Filters';
+import { Filters, FILTERS_LIST } from '../types/Filters';
 
 type FooterProps = {
   filterField: Filters;
@@ -25,7 +25,7 @@ export const Footer: React.FC<FooterProps> = ({
       </span>
 
       <nav className="filter" data-cy="Filter">
-        {filtersList.map(filter => (
+        {FILTERS_LIST.map(filter => (
           <a
             key={filter}
             href={`#/${filter}`}

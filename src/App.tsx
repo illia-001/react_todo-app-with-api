@@ -24,7 +24,7 @@ export const App: React.FC = () => {
   const [filterByField, setFilterByField] = useState<Filters>(Filters.Default);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
-  const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
+  // const [completedTodoIds, setCompletedTodoIds] = useState<number[]>([]);
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
   const [isInputDisable, setIsInputDisable] = useState(false);
   const [focus, setFocus] = useState(0);
@@ -38,13 +38,9 @@ export const App: React.FC = () => {
   const todosCount = todos.length;
   //#endregion
 
-  useEffect(() => {
-    const calculateCompletedTodos = todos
-      .filter(todo => todo.completed)
-      .map(todo => todo.id);
-
-    setCompletedTodoIds(calculateCompletedTodos);
-  }, [todos]);
+  let completedTodoIds = todos
+    .filter(todo => todo.completed)
+    .map(todo => todo.id);
 
   const handleShowError = (error: Errors) => {
     setErrorMessage(error);
@@ -149,9 +145,9 @@ export const App: React.FC = () => {
     setIsLoading(prev => [...prev, id]);
 
     if (!completedTodoIds.includes(id)) {
-      setCompletedTodoIds(prev => [...prev, id]);
+      completedTodoIds.push(id);
     } else {
-      setCompletedTodoIds(prev => prev.filter(todoId => todoId !== id));
+      completedTodoIds = completedTodoIds.filter(todoId => todoId !== id);
     }
 
     todoServise

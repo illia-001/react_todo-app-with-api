@@ -4,4 +4,4 @@ export enum Filters {
   Completed = 'Completed',
 }
 
-export const filtersList = Object.values(Filters);
+export const FILTERS_LIST = Object.values(Filters);
