@@ -1,7 +1,7 @@
 export enum Filters {
-  Default = 'all',
-  Active = 'active',
-  Completed = 'completed',
+  Default = 'All',
+  Active = 'Active',
+  Completed = 'Completed',
 }
 
 export const filtersList = Object.values(Filters);
